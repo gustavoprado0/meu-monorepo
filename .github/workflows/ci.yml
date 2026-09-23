@@ -1,0 +1,41 @@
+name: Monorepo CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint Web
+        run: yarn workspace web eslint .
+
+      - name: Lint Admin
+        run: yarn workspace admin eslint .
+
+      - name: Typecheck Web
+        run: yarn workspace web tsc --noEmit
+
+      - name: Typecheck Admin
+        run: yarn workspace admin tsc --noEmit
